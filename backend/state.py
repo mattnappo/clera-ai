@@ -7,23 +7,28 @@ from bson.json_util import dumps
 DBNAME = 'dev_db'
 
 # Map a filepath to uuid for each syllabus
-def filepath_to_id(filepath):
-    return hashlib.sha224(filepath.encode('utf-8')).hexdigest()[:16]
+def syllabus_id(filename, course):
+    return hashlib.sha224((filename + course).encode('utf-8')).hexdigest()[:16]
 
 class State:
     def __init__(self):
         self.client = pymongo.MongoClient(host="localhost", port=27017)
         self.db = self.client[DBNAME]
 
+        # Each user is their own collection
+
     def clear(self):
         self.client.drop_database(DBNAME)
 
     def print_db(self):
-        cursor = self.db.find({})
-        for document in cursor:
-            print(document)
+        print(self.db.list_collection_names())
+        for collection in self.db.list_collection_names():
+            print(collection)
+            cursor = self.db.collection.find({})
+            for document in cursor:
+                print(json.loads(dumps(document), indent=4))
 
-    def store_syllabus(self, user, filename, contents):
+    def store_syllabus(self, user, course, filename, contents):
         # Write file to disk
         path = os.path.abspath(f'./data/{user}/{filename}')
         os.system(f'mkdir -p {os.path.dirname(path)}')
@@ -31,34 +36,38 @@ class State:
             f.write(contents)
 
         # Store entry in mongo
-        user_obj = {
-            "user": user,
-            "syllabi": [
-                {
-                    # Metadata
-                    "id": filepath_to_id(path), # ID field
-                    "filepath": path,
+        syllabus_obj = {
+            # Metadata
+            "id": syllabus_id(path, course), # ID field
+            "course": course,
+            "filepath": path,
+            "course": "",
 
-                    # To be computed later by ML pipeline
-                    "course_title": "",
-                    "summary": "",
-                    "calendar": {},
-                    "gpa_weights": {},
-                },
-            ]
+            # To be computed later by ML pipeline
+            "summary": "",
+            "calendar": {},
+            "gpa_weights": {},
+            "questions": {},
         }
 
-        self.db.insert_one(user_obj)
+        self.db[user].create_index([('id', pymongo.TEXT)],
+            unique=True, name='index')
+
+        try:
+            self.db[user].insert_one(syllabus_obj)
+            return {"status": "ok"}
+        except pymongo.errors.DuplicateKeyError: # Doesn't work
+            return {"status": "document already exists"}
 
     # Return all syllabi with summaries
     def get_user(self, user):
-        cursor = self.db.find({"user": user})
+        cursor = self.db[user].find({})
         json_user = dumps(list(cursor), indent = 2)
-        return json_user
+        return json.loads(json_user)
 
     # Set the summary of a user's syllabus
-    def set_summary(self, user, syllabus_id, summary):
-        pass
+    def set_summary(self, user, course, summary):
+        self.db[user].update_one({"course": course}, {"$set": {"summary": summary}})
 
     # Set calendar obj of syllabus
     def set_calendar(self, user, syllabus_id, calendar_obj):
