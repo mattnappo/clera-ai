@@ -6,8 +6,13 @@ export default function Home() {
   const [syllabiCount, setSyllabiCount] = useState(0);
   const [syllabi, setSyllabi] = useState([]);
   const [syllabiNames, setSyllabiNames] = useState([]);
-  const [uploading, setUploading] = useState(false)
-  const [user, setUser] = useState("Clark Kent")
+  const [uploadingSyllabus, setUploadingSyllabus] = useState(false)
+  const [loadingAnswer, setLoadingAnswer] = useState(false)
+  const [userSubmitted, setUserSubmitted] = useState(false)
+  const [question, setQuestion] = useState()
+  //const [user, setUser] = useState("Clark Kent")
+  const [user, setUser] = useState("")
+  const [answer, setAnswer] = useState("Aliquet nec orci mattis amet quisque ullamcorper neque, nibh sem. At arcu, sit dui mi, nibh dui, diam eget aliquam. Quisque id at vitae feugiat egestas ac. Diam nulla orci at in viverra scelerisque eget. Eleifendegestas fringilla sapien.")
 
   const deleteSyllabus = async (e, syllabusName) => {
     let syllabiTemp = syllabi.slice()
@@ -27,12 +32,16 @@ export default function Home() {
     //await axios.delete(`/api/upload/delete/${path}`)
   }
 
+  const askQuestion = async(e) => {
+    setAnswer(question);
+  }
+
   const uploadFileHandler = async (e) => {
     let syllabiTemp = syllabi
     let syllabiNamesTemp = syllabiNames
 
     try {
-      setUploading(true)
+      setUploadingSyllabus(true)
 
       for (let i = 0; i < e.target.files.length; i += 1) {
         const file = e.target.files[i]
@@ -55,16 +64,61 @@ export default function Home() {
 
       setSyllabi(syllabiTemp)
       setSyllabiNames(syllabiNamesTemp)
-      setUploading(false)
+      setUploadingSyllabus(false)
     } catch (error) {
       console.error(error)
-      setUploading(false)
+      setUploadingSyllabus(false)
     }
   }
+
 
   return (
     <>
       <Header/>
+
+      {!userSubmitted ? (
+        <main className="text-center">
+          <h1 className="text-3xl text-gray-200 mb-2 "></h1>
+
+          <div className="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-200">Enter a username to login or create an account</h2>
+        </div>
+
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            <form className="space-y-6" action="#" method="POST">
+              <div>
+                <label htmlFor="user" className="block text-sm font-medium text-gray-700">
+                  Username
+                </label>
+                <div className="mt-1">
+                  <input
+                    id="user"
+                    name="user"
+                    type="user"
+                    autoComplete="user"
+                    onChange={e => setUser(e.target.value)}
+                    required
+                    className="block w-full a bg-gray-100 ppearance-none rounded-md border text-gray-800 border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  onClick={(e) => setUserSubmitted(true)}
+                  className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  Sign in/sign up
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+        </main>
+        ) : (
       <main className='lg:min-h-screen lg:overflow-hidden lg:flex lg:flex-row-reverse'>
 
       <section
@@ -141,48 +195,51 @@ export default function Home() {
         </ul>
       </section>
 
- 
-
-
-
       {/* Chatbot section */}
       <section
           aria-labelledby='chatbot'
           className='flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24'
         >
-          <h1 className="text-3xl text-gray-200 mb-2 ">Hi, {user}</h1>
+        <h1 className="text-3xl text-gray-200 mb-2 ">Hi, {user}</h1>
         <div className="flex items-start space-x-4">
           <div className="min-w-0 flex-1">
-            <form action="#">
-              <div className="border-b border-gray-200 focus-within:border-indigo-600">
-                <label htmlFor="comment" className="sr-only">
-                  Add your comment
-                </label>
-                <textarea
-                  rows={2}
-                  name="comment"
-                  id="comment"
-                  className="block w-full resize-none border-0 border-b border-transparent p-0 pb-2 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
-                  placeholder=" Ask your question..."
-                  defaultValue={''}
-                />
+            <div className="border-b border-gray-200 focus-within:border-indigo-600">
+              <label htmlFor="comment" className="sr-only">
+                Ask your question
+              </label>
+              <textarea
+                rows={2}
+                name="comment"
+                id="comment"
+                className="block w-full resize-none border-0 border-b border-transparent p-0 pb-2 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
+                placeholder=" Ask your question..."
+                defaultValue={''}
+                onChange={e => setQuestion(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between pt-2">
+              <div className="flex-shrink-0">
+                <button
+                  onClick={askQuestion}
+                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2"
+                >
+                  Ask
+                </button>
               </div>
-              <div className="flex justify-between pt-2">
-                <div className="flex-shrink-0">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                  >
-                    Ask
-                  </button>
-                </div>
-              </div>
-            </form>
+            </div>
+
+          {(answer && answer != "") && (
+            <div class="mt-6 bg-clip-border p-6 bg-gray-800 border-4 border-gray-500 border-dashed">
+              <p className="text-xl leading-8 text-gray-200">
+                {answer}
+              </p>
+            </div>
+          )}
           </div>
         </div>
       </section>
-
-    </main>
+      </main>
+    )}
     </>
   )
 }
