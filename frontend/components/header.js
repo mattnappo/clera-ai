@@ -5,7 +5,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-export default function Example() {
+export default function Header({changeUser}) {
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -28,11 +28,26 @@ export default function Example() {
                 <div className="hidden lg:ml-6 lg:block">
                   <div className="flex space-x-4">
                     {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
-                    <a href="/" 
+                     <button
+                   onClick={e => {
+                    changeUser;
+                    console.log("hanginggg")
+                    changeUser(e);
+                    //   console.log(window.localStorage.getItem('user'));
+
+                    //   console.log("RUNNING");
+                    //   window.localStorage.setItem('user', "anythingelse");
+                    //   console.log(window.localStorage.getItem('user'));
+                      //window.location.href = "/";
+                    } 
+                  }
+                    
+                    // onClick={this.props.changeUser}
+                    
                     className="rounded-md px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 hover:text-white"
                     >
                       Change user
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -55,7 +70,12 @@ export default function Example() {
               {/* Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" */}
               <Disclosure.Button
                 as="a"
-                href="/"
+                onClick={e => {
+                  console.log("RUNNING");
+                  window.localStorage.setItem('user', "");
+                  window.location.href = "/heyooo";
+                }
+                }
                 className="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
               >
                 Change user
