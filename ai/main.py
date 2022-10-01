@@ -9,12 +9,16 @@ openai.api_key = OPENAI_KEY
 
 app = FastAPI()
 
+files = ["syllabus.pdf"]
 prompts = ["What are the key points?", "List the times of all exams", "Who is class taugh by?"]
 
-def summarize(file_name):
+def extract_text(file_name):
     reader = PyPDF2.PdfFileReader(os.path.join(os.getcwd(), file_name)).pages[0]
     text = reader.extract_text()
     
+    return text
+
+def summarize(text):
     response = openai.Completion.create(
         model="text-davinci-002",
         prompt=f"Summarize this syllabus:\n\n{text}",
@@ -27,14 +31,28 @@ def summarize(file_name):
     
     return text, response['choices'][0]['text']
 
-@app.post("/summarize")
-async def get_summary(file_name : Request):
-    req_info = await file_name.json()
-    text, summary = summarize(req_info["file"])
+def q_and_a(knowledge, question):
+    response = openai.Completion.create(
+        model="text-davinci-002",
+        prompt=f"{knowledge}\n\nQ: {question}",
+        temperature=0,
+        max_tokens=100,
+        top_p=1,
+        frequency_penalty=0.0,
+        presence_penalty=0.0,
+        stop=["\n\n"]
+    )
+    
+    return response['choices'][0]['text']
+
+@app.post("/chat")
+async def chat(question : Request):
+    q = await question.json()
+    text = extract_text(files[0])
+    
+    a = q_and_a(text, q['question'])
     
     return {
-        "status" : "SUCCESS",
-        "text" : text,
-        "summary" : summary
+        "answer" : a[a.index(":") + 2:]
     }
     
