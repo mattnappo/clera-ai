@@ -14,16 +14,22 @@ def read_root():
 def upload_syllabus(user: str = Form(), syllabus: UploadFile = Form()):
     contents = syllabus.file.read()
     state.store_syllabus(user, syllabus.filename, contents)
+
+    ''' DO ML STUFF HERE '''
+
     return {"status": "ok"}
 
 @app.post("/upload_all/")
 def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
     for syllabus in syllabi:
-        contents = syllabus.file.read()
-        state.store_syllabus(user, syllabus.filename, contents)
-
+        upload_syllabus(user, syllabus)
     return {"status": "ok"}
 
 @app.get("/user/{user}")
-def get_syllabi(user: str):
-    pass
+def get_user(user: str):
+    return state.get_user(user)
+
+@app.get("/clear")
+def clear():
+    state.clear()
+    return {"status": "ok"}
