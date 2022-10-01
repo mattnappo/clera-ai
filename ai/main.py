@@ -12,6 +12,8 @@ app = FastAPI()
 files = ["syllabus.pdf"]
 prompts = ["What are the key points?", "List the times of all exams", "Who is class taugh by?"]
 
+options = [] # add short long answer
+
 def extract_text(file_name):
     reader = PyPDF2.PdfFileReader(os.path.join(os.getcwd(), file_name)).pages[0]
     text = reader.extract_text()
@@ -34,7 +36,7 @@ def summarize(text):
 def q_and_a(knowledge, question):
     response = openai.Completion.create(
         model="text-davinci-002",
-        prompt=f"{knowledge}\n\nQ: {question}",
+        prompt=f"{knowledge}\n\nQ: {question}\n Give a brief answer. A:",
         temperature=0,
         max_tokens=100,
         top_p=1,
@@ -53,6 +55,17 @@ async def chat(question : Request):
     a = q_and_a(text, q['question'])
     
     return {
-        "answer" : a[a.index(":") + 2:]
+        "answer" : a
+    }
+    
+@app.post("/summarize")
+async def get_summary(file_name : Request):
+    file_name = await file_name.json()
+    text = extract_text(files[0])
+    
+    summary = summarize(text, file_name['file'])
+    
+    return {
+        "summary" : summary
     }
     
