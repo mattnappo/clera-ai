@@ -1,17 +1,13 @@
-import Head from 'next/head'
 import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-
 import React, { useState } from 'react';
-import SyllabiList from 'components/syllabiList'
 import Header from 'components/header'
-import { PlusIcon } from '@heroicons/react/20/solid'
 
 export default function Home() {
   const [syllabiCount, setSyllabiCount] = useState(0);
   const [syllabi, setSyllabi] = useState([]);
   const [syllabiNames, setSyllabiNames] = useState([]);
   const [uploading, setUploading] = useState(false)
+  const [user, setUser] = useState("Clark Kent")
 
   const deleteSyllabus = async (e, syllabusName) => {
     let syllabiTemp = syllabi.slice()
@@ -80,7 +76,7 @@ export default function Home() {
           </h2>
           <h2
             id='order-heading'
-            className='ml-6 mt-6 text-lg font-medium text-gray-200'
+            className='ml-6 mt-2 text-lg font-medium text-gray-200'
           >
             Syllabi
           </h2>
@@ -103,7 +99,7 @@ export default function Home() {
                         <h1>{syllabiNames[index]}</h1>
                         <button
                           type='button'
-                          className='text-sm font-medium text-mainTheme hover:text-mainTheme'
+                          className='text-sm font-medium text-red-500 hover:text-red-700'
                           value={syllabus}
                           key={syllabus}
                           onClick={e => deleteSyllabus(e, syllabiNames[index])}
@@ -145,7 +141,48 @@ export default function Home() {
         </ul>
       </section>
 
-      </main>
+ 
+
+
+
+      {/* Chatbot section */}
+      <section
+          aria-labelledby='chatbot'
+          className='flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24'
+        >
+          <h1 className="text-3xl text-gray-200 mb-2 ">Hi, {user}</h1>
+        <div className="flex items-start space-x-4">
+          <div className="min-w-0 flex-1">
+            <form action="#">
+              <div className="border-b border-gray-200 focus-within:border-indigo-600">
+                <label htmlFor="comment" className="sr-only">
+                  Add your comment
+                </label>
+                <textarea
+                  rows={2}
+                  name="comment"
+                  id="comment"
+                  className="block w-full resize-none border-0 border-b border-transparent p-0 pb-2 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
+                  placeholder=" Ask your question..."
+                  defaultValue={''}
+                />
+              </div>
+              <div className="flex justify-between pt-2">
+                <div className="flex-shrink-0">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  >
+                    Ask
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
     </>
   )
 }
