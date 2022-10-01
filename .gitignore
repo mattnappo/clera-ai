@@ -1,5 +1,6 @@
 data/
 .DS_Store
+data/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -132,3 +133,4 @@ dmypy.json
 
 /ai/ai
 /ai/.env
+/ai/syllabus.pdf
