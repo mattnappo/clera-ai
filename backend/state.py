@@ -41,9 +41,9 @@ class State:
             "id": syllabus_id(path, course), # ID field
             "course": course,
             "filepath": path,
-            "course": "",
 
             # To be computed later by ML pipeline
+            "syllabus_text": "",
             "summary": "",
             "calendar": {},
             "gpa_weights": {},
@@ -55,9 +55,21 @@ class State:
 
         try:
             self.db[user].insert_one(syllabus_obj)
-            return {"status": "ok"}
+            return {"status": "ok", "abspath": path}
         except pymongo.errors.DuplicateKeyError: # Doesn't work
             return {"status": "document already exists"}
+
+    def store_ml(self, user, course, info_obj, text):
+        print(info_obj)
+        print(text)
+        self.db[user].update_one(
+            {"course": course},
+            {"$set": {
+                "syllabus_text": text,
+                "summary": info_obj['summary'],
+                "questions": info_obj['questions'],
+            }})
+
 
     # Return all syllabi with summaries
     def get_user(self, user):
@@ -67,14 +79,20 @@ class State:
 
     # Set the summary of a user's syllabus
     def set_summary(self, user, course, summary):
-        self.db[user].update_one({"course": course}, {"$set": {"summary": summary}})
+        self.db[user].update_one(
+            {"course": course},
+            {"$set": {"summary": summary}})
 
     # Set calendar obj of syllabus
-    def set_calendar(self, user, syllabus_id, calendar_obj):
-        pass
+    def set_calendar(self, user, course, calendar_obj):
+        self.db[user].update_one(
+            {"course": course},
+            {"$set": {"calendar": calendar_obj}})
 
     # Set gpa obj of syllabus
-    def set_gpa(self, user, syllabus_id, gpa_obj):
-        pass
+    def set_gpa(self, user, course, gpa_obj):
+        self.db[user].update_one(
+            {"course": course},
+            {"$set": {"gpa": gpa_obj}})
 
 
