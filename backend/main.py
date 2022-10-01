@@ -37,9 +37,8 @@ def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: UploadFi
     #print(info_obj)
     #print(text)
     # Store output of ML in db
-    state.store_ml(user, course, info_obj, text)
-
-    #state.print_db()
+    status = state.store_ml(user, course, info_obj, text)
+    return status
 
 @app.post("/upload_all/DEP/") # Deprecated
 def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):

@@ -62,14 +62,16 @@ class State:
     def store_ml(self, user, course, info_obj, text):
         print(info_obj)
         print(text)
-        self.db[user].update_one(
-            {"course": course},
-            {"$set": {
-                "syllabus_text": text,
-                "summary": info_obj['summary'],
-                "questions": info_obj['questions'],
-            }})
-
+        try:
+            self.db[user].update_one(
+                {"course": course},
+                {"$set": {
+                    "syllabus_text": text,
+                    "summary": info_obj['summary'],
+                    "questions": info_obj['questions'],
+                }})
+        except Exception:
+            return {"status": "error"}
 
     # Return all syllabi with summaries
     def get_user(self, user):
