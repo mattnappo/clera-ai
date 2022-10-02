@@ -71,6 +71,8 @@ def q_and_a(knowledge, question):
         presence_penalty=0.0,
         stop=["\n\n"]
     )
+
+    print(response['choices'])
     
     return response['choices'][0]['text']
 
