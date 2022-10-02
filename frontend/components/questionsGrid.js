@@ -35,7 +35,7 @@ export default function QuestionsGrid({questionsList}) {
                       {course.questions.map((questionItem, questionIdx) => (
                         <tr
                           key={questionItem.question}
-                          className={classNames(questionIdx === 0 ? 'border-gray-300' : 'border-gray-200', 'border-t text-clip')}
+                          className={classNames(questionIdx === 0 ? 'bg-gray-border-gray-300' : 'border-gray-200', 'border-t text-clip')}
                         >
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-clip">
                             {questionItem.question}
