@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 from typing import Optional
 from pydantic import BaseModel
 import json
+from typing import List
 
 import backend.ai as ai
 import backend.state as state
@@ -12,6 +13,10 @@ class Course(BaseModel):
     summary: Optional[str]
     calendar: Optional[dict]
     gpa: Optional[dict]
+
+class QA(BaseModel):
+    prompt: str
+    user: str
 
 app = FastAPI()
 state = state.State()
@@ -50,6 +55,15 @@ def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
 @app.get("/user/{user}")
 def get_user(user: str):
     return state.get_user(user)
+
+@app.get("/full_qa")
+def naive_q_and_a(req: QA):
+    # concatenate all data together
+    knowledge = state.get_user_knowledge(req.user)
+
+    # Make req to davinci
+    answer = ai.q_and_a(knowledge, req.prompt)
+    return {"answer": answer}
 
 @app.get("/clear")
 def clear():

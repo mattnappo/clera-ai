@@ -78,6 +78,14 @@ class State:
         json_user = dumps(list(cursor), indent = 2)
         return json.loads(json_user)
 
+    # Get complete knowledge base of a user
+    def get_user_knowledge(self, user):
+        text = []
+        cursor = self.db[user].find({})
+        for doc in cursor:
+            text.append(doc['syllabus_text'])
+        return '\n'.join(text)
+
     # Set the summary of a user's syllabus
     def set_summary(self, user, course, summary):
         self.db[user].update_one(
