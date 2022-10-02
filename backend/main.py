@@ -16,10 +16,6 @@ class Course(BaseModel):
 app = FastAPI()
 state = state.State()
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
 @app.get("/test/user/{user}")
 def test_user(user: str):
     with open("test.json") as f:
