@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import Header from "components/header";
 import Loader from "components/loader";
 import QuestionsGrid from "components/questionsGrid";
+import axios from "axios";
+//require('dotenv').config();
 
 export default function Home() {
     const [syllabiCount, setSyllabiCount] = useState(0);
@@ -12,82 +14,31 @@ export default function Home() {
     const [loadingAnswer, setLoadingAnswer] = useState(false);
     const [userSubmitted, setUserSubmitted] = useState(false);
     const [question, setQuestion] = useState();
-    //const [user, setUser] = useState("Clark Kent")
     const [user, setUser] = useState();
     const [tempUser, setTempUser] = useState();
     const [answer, setAnswer] = useState(
         "Enter a question about one of your courses and the AI will find an answer!"
     );
+    const [courseSummary, setCourseSummary] = useState();
+
+    useEffect(() => {
+        axios
+            .get(process.env.NEXT_PUBLIC_BASE_URL + "/test/user/matt")
+            .then((response) => {
+                setCourseSummary(response.data);
+                console.log(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, []);
 
     useEffect(() => {
         setUser(window.localStorage.getItem("user"));
     }, []);
 
-    const courseSummary = [
-        {
-            id: "some unique id",
-            course: "math 220",
-            filepath: "/home/matt/data/220syllabus.pdf",
-            summary: "summary of pdf here",
-            calendar: {
-                // idk yet
-            },
-            gpa_weights: {
-                homework: 0.2,
-                "exam 1": 0.3,
-                "exam 2": 0.3,
-                projects: 0.2,
-            },
-            questions: [
-                {
-                    question: "What date is my first exam?",
-                    answer: "1 November 2022",
-                },
-                {
-                    question: "Who are my professors?",
-                    answer: "Clarke Kent and Bruce Wayne.",
-                },
-                {
-                    question: "What does my Tuesday schedule look like?",
-                    answer: "You only have mathematics that day.",
-                },
-            ],
-        },
-        {
-            id: "some unique id 2",
-            course: "math 221",
-            filepath: "/home/matt/data/randomname.pdf",
-            summary: "summary of pdf here again",
-            calendar: {
-                // idk yet
-            },
-            gpa_weights: {
-                homework: 0.2,
-                "exam 1": 0.3,
-                "exam 2": 0.3,
-                projects: 0.2,
-            },
-            questions: [
-                {
-                    question: "What date is my first exam?",
-                    answer: "1 November 2022",
-                },
-                {
-                    question: "Who are my professors?",
-                    answer: "Clarke Kent and Bruce Wayne.",
-                },
-                {
-                    question: "What does my Tuesday schedule look like?",
-                    answer: "You only have mathematics that day.",
-                },
-            ],
-        },
-    ];
-
     useEffect(() => {
-        //if(user){
         window.localStorage.setItem("user", user);
-        //}
     }, [user]);
 
     const deleteSyllabus = async (e, syllabusName) => {
