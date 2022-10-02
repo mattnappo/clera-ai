@@ -29,13 +29,14 @@ class State:
             for document in cursor:
                 print(json.loads(dumps(document), indent=4))
 
-    def store_syllabus(self, user, course, filename, contents):
+    def store_syllabus(self, user, course, filename, contents=None):
         # Write file to disk
         path = os.path.abspath(f'./data/{user}/{filename}')
         
-        os.system(f'mkdir -p {os.path.dirname(path)}')
-        with open(path, 'wb') as f:
-            f.write(contents)
+        if contents:
+            os.system(f'mkdir -p {os.path.dirname(path)}')
+            with open(path, 'wb') as f:
+                f.write(contents)
 
         # Store entry in mongo
         syllabus_obj = {
@@ -79,8 +80,7 @@ class State:
         return json.loads(json_user)
 
     def get_syllabus(self, user, course):
-        cursor = self.db[user].find({"course": course})
-        return json.loads(cursor)
+        return json.loads(dumps(self.db[user].find_one({"course": course})))
 
     # Get complete knowledge base of a user
     def get_user_knowledge(self, user):
@@ -107,5 +107,4 @@ class State:
         self.db[user].update_one(
             {"course": course},
             {"$set": {"gpa": gpa_obj}})
-
 
