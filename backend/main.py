@@ -2,6 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Form
 import base64
 from typing import List, Optional
 from pydantic import BaseModel
+import json
 
 import backend.ai as ai
 import backend.state as state
@@ -20,8 +21,13 @@ state = state.State()
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/test/user/{user}")
+def test_user(user: str):
+    with open("test.json") as f:
+        return json.loads(f.read())
+
 @app.post("/upload/")
-def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: UploadFile = Form()):
+async def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: UploadFile = Form()):
     # Store in DB
     contents = syllabus.file.read()
     status = state.store_syllabus(user, course, syllabus.filename, contents)
@@ -30,9 +36,8 @@ def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: UploadFi
 
     # Read text from pdf
     text = ai.extract_text(status['abspath'])
-    print(text)
     # Do ML
-    info_obj = ai.get_class_info(text)
+    info_obj = await ai.get_class_info(text)
 
     #print(info_obj)
     #print(text)
@@ -54,7 +59,6 @@ def get_user(user: str):
 def clear():
     state.clear()
     return {"status": "ok"}
-
 
 # DEV ROUTES
 @app.post("/dev/set_summary/")

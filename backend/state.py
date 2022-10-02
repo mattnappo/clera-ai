@@ -60,18 +60,14 @@ class State:
             return {"status": "document already exists"}
 
     def store_ml(self, user, course, info_obj, text):
-        print(info_obj)
-        print(text)
-        try:
-            self.db[user].update_one(
-                {"course": course},
-                {"$set": {
-                    "syllabus_text": text,
-                    "summary": info_obj['summary'],
-                    "questions": info_obj['questions'],
-                }})
-        except Exception:
-            return {"status": "error"}
+        self.db[user].update_one(
+            {"course": course},
+            {"$set": {
+                "syllabus_text": text,
+                "summary": info_obj['summary'],
+                "questions": info_obj['questions'],
+            }})
+        return {"status": "ok"}
 
     # Return all syllabi with summaries
     def get_user(self, user):

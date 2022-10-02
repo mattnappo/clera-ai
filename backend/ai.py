@@ -2,6 +2,7 @@ import json
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 import openai, os, PyPDF2
+import time
 
 load_dotenv()
 
@@ -11,22 +12,38 @@ openai.api_key = OPENAI_KEY
 class_prompts = ["What is this class about?", "What is the class schedule?", "Who teaches the course?", "What is the grading?", "What is the academic honesty policy?", "When is the first exam?"]
 
 def extract_text(file_name):
-    reader = PyPDF2.PdfFileReader(file_name).pages[0]
-    text = reader.extract_text()
-    return text
+    reader = PyPDF2.PdfFileReader(file_name).pages
+    doc = []
+    for i in range(len(reader)):
+        doc.append(reader[i].extract_text())
+    return '\n'.join(doc)
 
-def get_class_info(text):
+async def get_class_info(text):
     info = {}
+
+    print("text")
+    print(text)
+    print("\n\n")
     
-    info["summary"] = summarize(text)
+    summary = await summarize(text)
+
+    print("summary")
+    print(summary)
+    print(type(summary))
+    print("\n\n")
+
+    info['summary'] = summary
     
-    info['questions'] = {}
-    for prompt in class_prompts:
-        info['questions'][prompt] = q_and_a(text, prompt)
-    
+    info['questions'] = []
+    for i, prompt in enumerate(class_prompts):
+        info['questions'].append({
+            "question": prompt,
+            "answer": q_and_a(text, prompt)
+        })
+
     return info
 
-def summarize(text):
+async def summarize(text):
     response = openai.Completion.create(
         model="text-davinci-002",
         prompt=f"Summarize this syllabus:\n\n{text}",
@@ -36,6 +53,10 @@ def summarize(text):
         frequency_penalty=0.0,
         presence_penalty=0.0
     )
+
+    time.sleep(3)
+
+    #print([response['choices'][i] for i in range(len(response['choices']))
     
     return response['choices'][0]['text']
 
