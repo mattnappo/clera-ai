@@ -8,29 +8,23 @@ load_dotenv()
 OPENAI_KEY = os.getenv('KEY')
 openai.api_key = OPENAI_KEY
 
-app = FastAPI()
-
-files = ["syllabus.pdf"]
-
 class_prompts = ["What is this class about?", "What is the class schedule?", "Who teaches the course?", "What is the grading?", "What is the academic honesty policy?", "When is the first exam?"]
 
-def get_class_info(file_name):
+def extract_text(file_name):
+    reader = PyPDF2.PdfFileReader(file_name).pages[0]
+    text = reader.extract_text()
+    return text
+
+def get_class_info(text):
     info = {}
     
-    text = extract_text(file_name)
+    info["summary"] = summarize(text)
     
-    info["Summary"] = summarize(text)
-    
+    info['questions'] = {}
     for prompt in class_prompts:
-        info[prompt] = q_and_a(text, prompt)
+        info['questions'][prompt] = q_and_a(text, prompt)
     
     return info
-
-def extract_text(file_name):
-    reader = PyPDF2.PdfFileReader(os.path.join(os.getcwd(), file_name)).pages[0]
-    text = reader.extract_text()
-    
-    return text
 
 def summarize(text):
     response = openai.Completion.create(
@@ -59,8 +53,10 @@ def q_and_a(knowledge, question):
     
     return response['choices'][0]['text']
 
-@app.post("/chat")
-async def chat(question : Request):
+# -- dev -- #
+
+'''
+async def chat(question: Request):
     q = await question.json()
     text = extract_text(files[0])
     
@@ -90,3 +86,4 @@ async def get_classes():
     
     return info
     
+'''

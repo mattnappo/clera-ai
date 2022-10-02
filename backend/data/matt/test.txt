@@ -1,9 +1,0 @@
-this is a text file
-
-
-
-
-it is small
-
-
-newline

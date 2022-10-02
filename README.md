@@ -1,5 +1,7 @@
 # hackmit22
 
-activate venv: source ai/bin/activate
+Put key in `.env` in root dir
 
-run: uvicorn main:app 
+From root dir:
+
+run: `uvicorn backend.main:app`
