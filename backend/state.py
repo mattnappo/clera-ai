@@ -78,6 +78,10 @@ class State:
         json_user = dumps(list(cursor), indent = 2)
         return json.loads(json_user)
 
+    def get_syllabus(self, user, course):
+        cursor = self.db[user].find({"course": course})
+        return json.loads(cursor)
+
     # Get complete knowledge base of a user
     def get_user_knowledge(self, user):
         text = []

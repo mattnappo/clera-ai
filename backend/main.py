@@ -44,7 +44,7 @@ async def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: Up
     #print(text)
     # Store output of ML in db
     status = state.store_ml(user, course, info_obj, text)
-    return status
+    return state.get_syllabus(user, course)
 
 @app.post("/upload_all/fut/") # Future
 def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
@@ -56,7 +56,7 @@ def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
 def get_user(user: str):
     return state.get_user(user)
 
-@app.get("/full_qa")
+@app.post("/full_qa")
 def naive_q_and_a(req: QA):
     # concatenate all data together
     knowledge = state.get_user_knowledge(req.user)
