@@ -11,16 +11,14 @@ export default function Home() {
   const [uploadingSyllabus, setUploadingSyllabus] = useState(false)
   const [loadingAnswer, setLoadingAnswer] = useState(false)
   const [userSubmitted, setUserSubmitted] = useState(false)
-  const [question, setQuestion] = useState("test")
+  const [question, setQuestion] = useState()
   //const [user, setUser] = useState("Clark Kent")
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState()
   const [tempUser, setTempUser] = useState()
-  const [answer, setAnswer] = useState("Aliquet nec orci mattis amet quisque ullamcorper neque, nibh sem. At arcu, sit dui mi, nibh dui, diam eget aliquam. Quisque id at vitae feugiat egestas ac. Diam nulla orci at in viverra scelerisque eget. Eleifendegestas fringilla sapien.")
+  const [answer, setAnswer] = useState("Enter a question about one of your courses and the AI will find an answer!")
 
   useEffect(() => {
-    //if(window.localStorage.getItem("user") != undefined){
-      setUser(window.localStorage.getItem('user'));
-    //}
+    setUser(window.localStorage.getItem('user'));
   }, []);
 
   const courseSummary = [
@@ -283,54 +281,65 @@ export default function Home() {
         )}
       </section>
 
-      {/* Chatbot section */}
-      <section
-          aria-labelledby='chatbot'
-          className='flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24'
-        >
-        <h1 className="text-3xl text-gray-200 mb-2 ">Hi, {user}</h1>
-        <div className="flex items-start space-x-4">
-          <div className="min-w-0 flex-1">
-            <div>
-              <label htmlFor="comment" className="sr-only">
-                Ask your question
-              </label>
-              <textarea
-                rows={2}
-                name="comment"
-                id="comment"
-                className="block w-full resize-none rounded-md border-0 border-b border-transparent p-0 pb-2 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
-                placeholder=" Ask your question..."
-                defaultValue={''}
-                onChange={e => setQuestion(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-between pt-2">
-              <div className="flex-shrink-0">
-                <button
-                  onClick={askQuestion}
-                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2"
-                >
-                  Ask
-                </button>
+    {(syllabiNames && syllabiNames.length > 0) ? (
+      <>
+        {/* Chatbot section */}
+        <section
+            aria-labelledby='chatbot'
+            className='flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24'
+          >
+          <h1 className="text-3xl text-gray-200 mb-2 ">Hi, {user}</h1>
+          <div className="flex items-start space-x-4">
+            <div className="min-w-0 flex-1">
+              <div>
+                <label htmlFor="comment" className="sr-only">
+                  Ask your question
+                </label>
+                <textarea
+                  rows={1}
+                  name="comment"
+                  id="comment"
+                  className="p-4 block w-full resize-none rounded-md border-0 border-b border-transparent p-0 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
+                  placeholder="Ask your question..."
+                  defaultValue={''}
+                  onChange={e => setQuestion(e.target.value)}
+                />
               </div>
+              <div className="flex justify-between pt-2">
+                <div className="flex-shrink-0">
+                  <button
+                    onClick={askQuestion}
+                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2"
+                  >
+                    Ask
+                  </button>
+                </div>
+              </div>
+              {loadingAnswer ? <Loader/> : (
+                <>
+                  {(answer && answer != "") && (
+                    <div class="mt-6 bg-clip-border p-6 bg-gray-800 border-4 border-gray-500 border-dashed">
+                      <p className="text-xl leading-8 text-gray-200">
+                        {answer}
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-            {loadingAnswer ? <Loader/> : (
-              <>
-                {(answer && answer != "") && (
-                  <div class="mt-6 bg-clip-border p-6 bg-gray-800 border-4 border-gray-500 border-dashed">
-                    <p className="text-xl leading-8 text-gray-200">
-                      {answer}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
           </div>
-        </div>
-        <QuestionsGrid questionsList={courseSummary}/>
+          <QuestionsGrid questionsList={courseSummary}/>
 
+        </section>
+      </>
+    ) : (
+      <section
+        aria-labelledby='firstUploadSyllabus'
+        className='flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24'
+      >
+        <h1 className="text-3xl text-gray-200 mb-2 ">Please upload a syllabus to begin</h1>
       </section>
+    )}
       </main>
     )}
     </>
