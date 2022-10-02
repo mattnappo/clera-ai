@@ -2,6 +2,7 @@ import Image from 'next/image'
 import React, { useState, useEffect } from 'react';
 import Header from 'components/header'
 import Loader from 'components/loader'
+import QuestionsGrid from 'components/questionsGrid'
 
 export default function Home() {
   const [syllabiCount, setSyllabiCount] = useState(0);
@@ -21,6 +22,67 @@ export default function Home() {
       setUser(window.localStorage.getItem('user'));
     //}
   }, []);
+
+  const courseSummary = [
+    {
+      "id": "some unique id",
+      "course": "math 220",
+      "filepath": "/home/matt/data/220syllabus.pdf",
+      "summary": "summary of pdf here",
+      "calendar": {
+        // idk yet
+      },
+      "gpa_weights": {
+        "homework": 0.2,
+        "exam 1": 0.3,
+        "exam 2": 0.3,
+        "projects": 0.2
+      },
+      "questions": [
+        {
+          "question": "What date is my first exam?",
+          "answer": "1 November 2022"
+        },
+        {
+          "question": "Who are my professors?",
+          "answer": "Clarke Kent and Bruce Wayne."
+        },
+        {
+          "question": "What does my Tuesday schedule look like?",
+          "answer": "You only have mathematics that day."
+        },
+      ],
+    },
+    {
+      "id": "some unique id 2",
+      "course": "math 221",
+      "filepath": "/home/matt/data/randomname.pdf",
+      "summary": "summary of pdf here again",
+      "calendar": {
+        // idk yet
+      },
+      "gpa_weights": {
+        "homework": 0.2,
+        "exam 1": 0.3,
+        "exam 2": 0.3,
+        "projects": 0.2
+      },
+      "questions": [
+        {
+          "question": "What date is my first exam?",
+          "answer": "1 November 2022"
+        },
+        {
+          "question": "Who are my professors?",
+          "answer": "Clarke Kent and Bruce Wayne."
+        },
+        {
+          "question": "What does my Tuesday schedule look like?",
+          "answer": "You only have mathematics that day."
+        },
+      ],
+    }
+  ]
 
   useEffect(() => {
     //if(user){
@@ -266,6 +328,8 @@ export default function Home() {
             )}
           </div>
         </div>
+        <QuestionsGrid questionsList={courseSummary}/>
+
       </section>
       </main>
     )}
