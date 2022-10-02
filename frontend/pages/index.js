@@ -74,7 +74,10 @@ export default function Home() {
       for (let i = 0; i < e.target.files.length; i += 1) {
         const file = e.target.files[i]
         const formData = new FormData()
+
         formData.append('syllabus', file)
+        formData.append('user', user)
+        formData.append('course', file.name)
 
         const config = {
           headers: {
@@ -82,10 +85,10 @@ export default function Home() {
           },
         }
 
-        //const { data } = await axios.post('/api/upload', formData, config)
-        //syllabiTemp.push(data)
+        const { data } = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + '/upload', formData, config)
+        syllabiTemp.push(data)
 
-        syllabiTemp.push(formData)
+        //syllabiTemp.push(formData)
 
         syllabiNamesTemp.push(file.name)
       }
