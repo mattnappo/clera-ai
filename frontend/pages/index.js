@@ -16,10 +16,8 @@ export default function Home() {
     const [question, setQuestion] = useState();
     const [user, setUser] = useState();
     const [tempUser, setTempUser] = useState();
-    const [answer, setAnswer] = useState(
-        "Enter a question about one of your courses and the AI will find an answer!"
-    );
-    const [courseSummary, setCourseSummary] = useState();
+    const [answer, setAnswer] = useState("");
+    const [courseSummary, setCourseSummary] = useState([]);
 
     useEffect(() => {
         axios
@@ -109,7 +107,7 @@ export default function Home() {
 
     return (
         <>
-            <Header changeUser={changeUser} />
+            {/* <Header changeUser={changeUser} /> */}
             {!user || user == "" || user == undefined ? (
                 <main className="text-center">
                     <h1 className="text-3xl text-gray-200 mb-2 "></h1>
@@ -289,7 +287,7 @@ export default function Home() {
                                             rows={1}
                                             name="comment"
                                             id="comment"
-                                            className="p-5 w-full resize-none rounded-md border-0 border-b border-transparent p-0 focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
+                                            className="p-4 w-full resize-none rounded-md border-0 border-b border-transparent  focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
                                             placeholder="Ask Clera here..."
                                             defaultValue={""}
                                             onChange={(e) =>
@@ -302,7 +300,7 @@ export default function Home() {
                                             <div className="">
                                                 <button
                                                     onClick={askQuestion}
-                                                    className="inline-flex py-4 items-center rounded-md border border-transparent bg-indigo-600 px-8 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-2"
+                                                    className="inline-flex py-4 items-center rounded-md border border-transparent bg-indigo-600 px-8 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                                                 >
                                                     Ask
                                                 </button>
@@ -316,8 +314,17 @@ export default function Home() {
                                     ) : (
                                         <>
                                             {answer && answer != "" && (
-                                                <div class="mt-6 bg-clip-border p-6 bg-gray-800 border-4 border-gray-500 border-dashed">
-                                                    <p className="text-xl leading-8 text-gray-200">
+                                                <div class="pt-3 w-full mt-10 bg-gray-800 border-4 border-gray-500 grid grid-cols-12">
+                                                    <div className="">
+                                                        <Image
+                                                            width={100}
+                                                            height={100}
+                                                            className="hidden lg:block"
+                                                            src={require("images/logo.png")}
+                                                            alt="HackMIT 2022"
+                                                        />
+                                                    </div>
+                                                    <p className="w-full pt-3 pl-3 pb-6 justify-left text-4xl text-gray-200 col-span-9">
                                                         {answer}
                                                     </p>
                                                 </div>
