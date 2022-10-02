@@ -47,7 +47,7 @@ class State:
             "summary": "",
             "calendar": {},
             "gpa_weights": {},
-            "questions": {},
+            "questions": []
         }
 
         self.db[user].create_index([('id', pymongo.TEXT)],

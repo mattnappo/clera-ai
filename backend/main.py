@@ -28,6 +28,7 @@ def test_user(user: str):
 
 @app.post("/upload/")
 async def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: UploadFile = Form()):
+    course = course.lower()
     # Store in DB
     contents = syllabus.file.read()
     status = state.store_syllabus(user, course, syllabus.filename, contents)
@@ -45,7 +46,7 @@ async def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: Up
     status = state.store_ml(user, course, info_obj, text)
     return status
 
-@app.post("/upload_all/DEP/") # Deprecated
+@app.post("/upload_all/fut/") # Future
 def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
     for syllabus in syllabi:
         upload_syllabus(user, syllabus)
@@ -58,21 +59,5 @@ def get_user(user: str):
 @app.get("/clear")
 def clear():
     state.clear()
-    return {"status": "ok"}
-
-# DEV ROUTES
-@app.post("/dev/set_summary/")
-def dev_set_summary(req: Course):
-    state.set_summary(req.user, req.course, req.summary)
-    return {"status": "ok"}
-
-@app.post("/dev/set_calendar/")
-def dev_set_calendar(user: str, course: str, calendar: dict):
-    state.set_calendar(user, course, calendar)
-    return {"status": "ok"}
-
-@app.post("/dev/set_gpa/")
-def dev_set_gpa(user: str, course: str, gpa: dict):
-    state.set_gpa(user, course, gpa)
     return {"status": "ok"}
 
