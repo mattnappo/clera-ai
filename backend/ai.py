@@ -1,4 +1,3 @@
-import json
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 import openai, os, PyPDF2
@@ -9,7 +8,7 @@ load_dotenv()
 OPENAI_KEY = os.getenv('KEY')
 openai.api_key = OPENAI_KEY
 
-class_prompts = ["What is this class about?", "What is the class schedule?", "Who teaches the course?", "What is the grading?", "What is the academic honesty policy?", "When is the first exam?"]
+class_prompts = ["What is the name of the course?", "At what time is the course?", "What is this class about?", "What is the class schedule?", "Who teaches the course?", "What is the grading?", "What books are needed?", "When is the first exam?"]
 
 def extract_text(file_name):
     reader = PyPDF2.PdfFileReader(file_name).pages

@@ -1,6 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form
-import base64
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 import json
 
@@ -16,10 +15,6 @@ class Course(BaseModel):
 
 app = FastAPI()
 state = state.State()
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 @app.get("/test/user/{user}")
 def test_user(user: str):
@@ -59,5 +54,6 @@ def get_user(user: str):
 @app.get("/clear")
 def clear():
     state.clear()
+    
     return {"status": "ok"}
 
