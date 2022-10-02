@@ -4,6 +4,7 @@ import Header from "components/header";
 import Loader from "components/loader";
 import QuestionsGrid from "components/questionsGrid";
 import axios from "axios";
+import { RESPONSE_LIMIT_DEFAULT } from "next/dist/server/api-utils";
 //require('dotenv').config();
 
 export default function Home() {
@@ -14,22 +15,23 @@ export default function Home() {
     const [loadingAnswer, setLoadingAnswer] = useState(false);
     const [userSubmitted, setUserSubmitted] = useState(false);
     const [question, setQuestion] = useState();
-    const [user, setUser] = useState();
+    const [user, setUser] = useState("");
     const [tempUser, setTempUser] = useState();
     const [answer, setAnswer] = useState("");
     const [courseSummary, setCourseSummary] = useState([]);
 
     useEffect(() => {
-        axios
-            .get(process.env.NEXT_PUBLIC_BASE_URL + "/test/user/matt")
-            .then((response) => {
-                setCourseSummary(response.data);
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
+        if(user && user != undefined && user != ""){
+            axios
+                .get(process.env.NEXT_PUBLIC_BASE_URL + `/user/${user}`)
+                .then((response) => {
+                    setCourseSummary(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
             });
-    }, []);
+        }
+    }, [user]);
 
     useEffect(() => {
         setUser(window.localStorage.getItem("user"));
@@ -61,7 +63,23 @@ export default function Home() {
         setLoadingAnswer(true);
 
         //API call to get answer
-        setAnswer(question);
+        const request = {
+            "user": user,
+            "prompt": question
+        };
+
+        console.log("getting QA")
+
+        const { data } = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + '/full_qa', request)
+        console.log("QA ans")
+        console.log(data)
+
+        if(data.answer == ""){
+            setAnswer("Sorry, I do not understand")
+        }
+        else{
+            setAnswer(data.answer);
+        }
 
         setLoadingAnswer(false);
     };
@@ -73,42 +91,84 @@ export default function Home() {
         try {
             setUploadingSyllabus(true);
 
-            for (let i = 0; i < e.target.files.length; i += 1) {
-                const file = e.target.files[i];
-                const formData = new FormData();
-                formData.append("syllabus", file);
+            // for (let i = 0; i < e.target.files.length; i += 1) {
+            //     const file = e.target.files[i]
+            //     const formData = new FormData()
+        
+            //     formData.append('syllabus', file)
+            //     formData.append('user', user)
+            //     formData.append('course', file.name)
 
-                const config = {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                };
+            //     //const { data } = await axios.post('/api/upload', formData, config)
+            //     //syllabiTemp.push(data)
 
-                //const { data } = await axios.post('/api/upload', formData, config)
-                //syllabiTemp.push(data)
+            //     syllabiTemp.push(formData);
 
-                syllabiTemp.push(formData);
+            //     syllabiNamesTemp.push(file.name);
+            // }
 
-                syllabiNamesTemp.push(file.name);
-            }
 
-            setSyllabi(syllabiTemp);
-            setSyllabiNames(syllabiNamesTemp);
-            setUploadingSyllabus(false);
-        } catch (error) {
-            console.error(error);
-            setUploadingSyllabus(false);
-        }
-    };
+            const file = e.target.files[0]
+            const formData = new FormData()
+    
+            formData.append('syllabus', file)
+            formData.append('user', user)
+            formData.append('course', file.name)
+
+            syllabiTemp.push(formData);
+
+            syllabiNamesTemp.push(file.name);
+
+            // setSyllabi(syllabiTemp);
+            // setSyllabiNames(syllabiNamesTemp);
+            // setUploadingSyllabus(false);
+
+        const config = {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+
+        const { data } = await axios.post(process.env.NEXT_PUBLIC_BASE_URL + '/upload', formData, config)
+
+        syllabiTemp.push(data)
+
+        //syllabiTemp.push(formData)
+
+        syllabiNamesTemp.push(file.name)
+      
+        setSyllabi(syllabiTemp)
+        setSyllabiNames(syllabiNamesTemp)
+        setUploadingSyllabus(false)
+
+        updateQuestionsSummary()
+
+      } catch (error) {
+        console.error(error)
+        setUploadingSyllabus(false)
+      }
+    }
+
+    function updateQuestionsSummary(){
+        axios
+            .get(process.env.NEXT_PUBLIC_BASE_URL + `/user/${user}`)
+            .then((response) => {
+                setCourseSummary(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
     function changeUser(e) {
-        setUser();
-    }
+          setUser();
+          window.localStorage.setItem('user', null);
+      }
 
     return (
         <>
             {/* <Header changeUser={changeUser} /> */}
-            {!user || user == "" || user == undefined ? (
+            {(!user || user == "" || user == undefined) ? (
                 <main className="text-center">
                     <h1 className="text-3xl text-gray-200 mb-2 "></h1>
 
@@ -173,23 +233,41 @@ export default function Home() {
                         <h2 id="summary-heading" className="sr-only">
                             Syllabi list
                         </h2>
-                        <h2
-                            id="order-heading"
-                            className="ml-6 mt-6 text-lg font-medium text-gray-200"
-                        >
-                            Upload center
-                        </h2>
+                        <div className="flex justify-between">
+                            <h2
+                                id="order-heading"
+                                className="ml-6 mt-6 text-lg font-medium text-gray-200"
+                            >
+                                Upload center
+                            </h2>
+                            <button
+                              onClick={(e) => {
+                                  changeUser(e);
+                                  //   console.log(window.localStorage.getItem('user'));
+
+                                  //   console.log("RUNNING");
+                                  //   window.localStorage.setItem('user', "anythingelse");
+                                  //   console.log(window.localStorage.getItem('user'));
+                                  //window.location.href = "/";
+                              }}
+                              // onClick={this.props.changeUser}
+
+                              className="mr-6 mt-4 rounded-md items-right justify-right content-right py-2 text-lg font-medium text-gray-200 hover:bg-gray-700 hover:text-white"
+                            >
+                              Change user
+                            </button>
+                        </div>
                         {uploadingSyllabus ? (
                             <Loader />
                         ) : (
                             <ul className="flex-auto overflow-y-auto divide-y divide-gray-200 px-6">
                                 {
                                     //check if user has added syllabi
-                                    syllabi &&
-                                        syllabi.length > 0 &&
-                                        syllabi.map((syllabus, index) => (
+                                    courseSummary &&
+                                    courseSummary.length > 0 &&
+                                        courseSummary.map((syllabus, index) => (
                                             <li
-                                                key={syllabiNames[index]}
+                                                key={syllabus.id}
                                                 className="flex py-6 space-x-4"
                                             >
                                                 <Image
@@ -203,12 +281,10 @@ export default function Home() {
                                                     <div className="flex space-x-4">
                                                         <h1>
                                                             {
-                                                                syllabiNames[
-                                                                    index
-                                                                ]
+                                                                syllabus.course
                                                             }
                                                         </h1>
-                                                        <button
+                                                        {/* <button
                                                             type="button"
                                                             className="text-sm font-medium text-red-500 hover:text-red-700"
                                                             value={syllabus}
@@ -223,7 +299,7 @@ export default function Home() {
                                                             }
                                                         >
                                                             Remove
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 </div>
                                             </li>
@@ -259,7 +335,6 @@ export default function Home() {
                                                 uploadFileHandler(e);
                                             }}
                                             defaultValue=""
-                                            multiple
                                             className="mt-2 ml-36 text-sm text-gray-900 font-medium text-center mb-6 content-center"
                                         />
                                     </div>
@@ -268,13 +343,16 @@ export default function Home() {
                         )}
                     </section>
 
-                    {syllabiNames && syllabiNames.length > 0 ? (
+                    {courseSummary && courseSummary.length > 0 ? (
                         <>
                             {/* Chatbot section */}
                             <section
                                 aria-labelledby="chatbot"
                                 className="flex-auto overflow-y-auto px-4 pt-12 pb-16 sm:px-6 sm:pt-16 lg:px-8 lg:pt-12 lg:pb-24"
                             >
+                            <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-200 mb-2">
+                                Hi, {user}
+                            </h2>
                                 <div className="flex items-start">
                                     <div className="w-full grid-1 mr-6">
                                         <label
@@ -283,11 +361,10 @@ export default function Home() {
                                         >
                                             Ask your question
                                         </label>
-                                        <textarea
-                                            rows={1}
+                                        <input
                                             name="comment"
                                             id="comment"
-                                            className="p-4 w-full resize-none rounded-md border-0 border-b border-transparent  focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
+                                            className="p-4 w-full resize-none bg-gray-100 rounded-md border-0 border-b border-transparent focus:border-indigo-600 focus:ring-0 sm:text-md text-gray-900"
                                             placeholder="Ask Clera here..."
                                             defaultValue={""}
                                             onChange={(e) =>
@@ -309,7 +386,7 @@ export default function Home() {
                                     </div>
                                 </div>
                                 <div className="">
-                                    {loadingAnswer ? (
+                                    {(loadingAnswer || uploadingSyllabus) ? (
                                         <Loader />
                                     ) : (
                                         <>
@@ -317,8 +394,8 @@ export default function Home() {
                                                 <div class="pt-3 w-full mt-10 bg-gray-800 border-4 border-gray-500 grid grid-cols-12">
                                                     <div className="">
                                                         <Image
-                                                            width={100}
-                                                            height={100}
+                                                            width={160}
+                                                            height={160}
                                                             className="hidden lg:block"
                                                             src={require("images/logo.png")}
                                                             alt="HackMIT 2022"
