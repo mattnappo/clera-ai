@@ -1,6 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form
-import base64
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 import json
 
@@ -45,12 +44,6 @@ async def upload_syllabus(user: str = Form(), course: str = Form(), syllabus: Up
     status = state.store_ml(user, course, info_obj, text)
     return status
 
-@app.post("/upload_all/DEP/") # Deprecated
-def upload_syllabi(user: str = Form(), syllabi: List[UploadFile] = Form()):
-    for syllabus in syllabi:
-        upload_syllabus(user, syllabus)
-    return {"status": "ok"}
-
 @app.get("/user/{user}")
 def get_user(user: str):
     return state.get_user(user)
@@ -58,6 +51,7 @@ def get_user(user: str):
 @app.get("/clear")
 def clear():
     state.clear()
+    
     return {"status": "ok"}
 
 # DEV ROUTES

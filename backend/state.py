@@ -22,6 +22,7 @@ class State:
 
     def print_db(self):
         print(self.db.list_collection_names())
+        
         for collection in self.db.list_collection_names():
             print(collection)
             cursor = self.db.collection.find({})
@@ -31,6 +32,7 @@ class State:
     def store_syllabus(self, user, course, filename, contents):
         # Write file to disk
         path = os.path.abspath(f'./data/{user}/{filename}')
+        
         os.system(f'mkdir -p {os.path.dirname(path)}')
         with open(path, 'wb') as f:
             f.write(contents)
@@ -55,8 +57,9 @@ class State:
 
         try:
             self.db[user].insert_one(syllabus_obj)
+            
             return {"status": "ok", "abspath": path}
-        except pymongo.errors.DuplicateKeyError: # Doesn't work
+        except pymongo.errors.DuplicateKeyError:
             return {"status": "document already exists"}
 
     def store_ml(self, user, course, info_obj, text):

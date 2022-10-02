@@ -1,4 +1,3 @@
-import json
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 import openai, os, PyPDF2
