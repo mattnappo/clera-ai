@@ -30,6 +30,8 @@ export default function QuestionsGrid({questionsList}) {
                           className="bg-gray-50 px-4 py-2 text-left text-sm font-bold text-gray-900 sm:px-6 h-auto"
                         >
                           {course.course}
+                          {course.summary}
+                          {console.log(course)}
                         </th>
                       </tr>
                       {course.questions.map((questionItem, questionIdx) => (
@@ -38,7 +40,7 @@ export default function QuestionsGrid({questionsList}) {
                           className={classNames(questionIdx === 0 ? 'bg-gray-border-gray-300' : 'border-gray-200', 'border-t text-clip')}
                         >
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-clip">
-                            {questionItem.question}
+                            {questionItem.question} 
                           </td>
                           <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">{questionItem.answer}</td>
                         </tr>
