@@ -1,16 +1,5 @@
 import { Fragment } from 'react'
 
-const locations = [
-  {
-    name: 'Edinburgh',
-    people: [
-      { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
-      { name: 'Courtney Henry', title: 'Designer', email: 'courtney.henry@example.com', role: 'Admin' },
-    ],
-  },
-  // More people...
-]
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
@@ -51,7 +40,7 @@ export default function QuestionsGrid({questionsList}) {
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 text-clip">
                             {questionItem.question}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{questionItem.answer}</td>
+                          <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">{questionItem.answer}</td>
                         </tr>
                       ))}
                     </Fragment>
