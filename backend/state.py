@@ -88,7 +88,9 @@ class State:
         cursor = self.db[user].find({})
         for doc in cursor:
             text.append(doc['syllabus_text'])
-        return '\n'.join(text)
+        knowledge = '\n'.join(text)
+
+        return knowledge
 
     # Set the summary of a user's syllabus
     def set_summary(self, user, course, summary):
